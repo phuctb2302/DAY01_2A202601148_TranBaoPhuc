@@ -42,6 +42,7 @@ OPENAI_MINI_MODEL = os.getenv("LAB_MINI_MODEL", "gpt-4o-mini")
 # PART 1 — API CƠ BẢN (Block 1: 15h00–15h40)
 # ===========================================================================
 
+
 # ---------------------------------------------------------------------------
 # Task 1.1 — Gọi GPT-4o
 # ---------------------------------------------------------------------------
@@ -52,24 +53,7 @@ def call_openai(
     top_p: float = 0.9,
     max_tokens: int = 256,
 ) -> tuple[str, float]:
-    """
-    Gọi OpenAI Chat Completions API, trả về nội dung phản hồi + độ trễ.
 
-    Args:
-        prompt:      Tin nhắn của người dùng.
-        model:       Model OpenAI sử dụng (mặc định: gpt-4o).
-        temperature: Độ ngẫu nhiên khi lấy mẫu (0.0 – 2.0).
-        top_p:       Ngưỡng nucleus sampling.
-        max_tokens:  Số token tối đa được sinh ra.
-
-    Returns:
-        Tuple (response_text: str, latency_seconds: float).
-
-    Gợi ý:
-        from openai import OpenAI            # import BÊN TRONG hàm
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        # đo thời gian bằng time.time() trước và sau lời gọi API
-    """
     # TODO: import OpenAI, tạo client, gọi chat.completions.create,
     #       đo start/end time, trả về (response_text, latency)
     # raise NotImplementedError("Implement call_openai")
@@ -164,9 +148,11 @@ def compare_models(prompt: str) -> dict:
         "gpt4o_cost": gpt4o_cost,
     }
 
+
 # ===========================================================================
 # PART 2 — SYSTEM PROMPT & TOKEN (Block 2: 15h40–16h20)
 # ===========================================================================
+
 
 # ---------------------------------------------------------------------------
 # Task 2.1 — Chat với system prompt (persona)
@@ -179,6 +165,7 @@ def chat_with_system_prompt(
     max_tokens: int = 256,
 ) -> tuple[str, float]:
     from openai import OpenAI
+
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     start_time = time.perf_counter()
     response = client.chat.completions.create(
@@ -201,6 +188,8 @@ def chat_with_system_prompt(
     response_text = response.choices[0].message.content
 
     return response_text, latency_seconds
+
+
 # ---------------------------------------------------------------------------
 # Task 2.2 — Đếm token bằng tiktoken
 # ---------------------------------------------------------------------------
@@ -232,6 +221,7 @@ def count_tokens(text: str, model: str = OPENAI_MODEL) -> int:
         return len(enc.encode(text))
     except Exception:
         return max(1, len(text) // 4)
+
 
 # ---------------------------------------------------------------------------
 # Task 2.3 — Ước tính chi phí chính xác
@@ -277,9 +267,11 @@ def estimate_cost(prompt: str, response: str, model: str = OPENAI_MODEL) -> dict
         "total_cost": total_cost,
     }
 
+
 # ===========================================================================
 # PART 3 — STREAMING & ĐỘ BỀN (Block 3: 16h30–17h10)
 # ===========================================================================
+
 
 # ---------------------------------------------------------------------------
 # Task 3.1 — Chatbot streaming có lịch sử hội thoại
@@ -304,6 +296,7 @@ def streaming_chatbot() -> None:
     """
     # TODO: vòng lặp while, đọc input, stream phản hồi, duy trì history
     from openai import OpenAI
+
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     history = []
     while True:
@@ -369,7 +362,7 @@ def retry_with_backoff(
             if attempt == max_retries:
                 raise
 
-            time.sleep(base_delay * (2 ** attempt))
+            time.sleep(base_delay * (2**attempt))
 
 
 # ===========================================================================
@@ -441,7 +434,6 @@ def run_assistant(
     total_cost = 0.0
 
     while True:
-
         if max_turns is not None and turns >= max_turns:
             break
 
@@ -506,6 +498,7 @@ def run_assistant(
         "history": history,
     }
 
+
 # ===========================================================================
 # BONUS (không bắt buộc — cho bạn nào xong sớm)
 # ===========================================================================
@@ -526,6 +519,7 @@ def batch_compare(prompts: list[str]) -> list[dict]:
 
     return results
 
+
 def format_comparison_table(results: list[dict]) -> str:
     """
     Định dạng kết quả batch_compare thành bảng text dễ đọc.
@@ -533,19 +527,17 @@ def format_comparison_table(results: list[dict]) -> str:
     Cột: Prompt | GPT-4o Response | Mini Response | GPT-4o Latency | Mini Latency
     Gợi ý: cắt text dài còn 40 ký tự cho dễ nhìn.
     """
+
     # TODO (bonus): dựng chuỗi bảng và trả về
     def shorten(text: str, max_len: int = 40) -> str:
         text = str(text)
         if len(text) <= max_len:
             return text
-        return text[:max_len - 3] + "..."
+        return text[: max_len - 3] + "..."
 
     lines = []
 
-    header = (
-        "Prompt | GPT-4o Response | Mini Response | "
-        "GPT-4o Latency | Mini Latency"
-    )
+    header = "Prompt | GPT-4o Response | Mini Response | GPT-4o Latency | Mini Latency"
     lines.append(header)
     lines.append("-" * len(header))
 
@@ -575,7 +567,7 @@ if __name__ == "__main__":
     print("\n=== Trợ lý CLI (gõ 'quit' để thoát) ===")
     stats = run_assistant(
         persona="Bạn là trợ giảng thân thiện của khóa AI, "
-                "trả lời ngắn gọn bằng tiếng Việt.",
+        "trả lời ngắn gọn bằng tiếng Việt.",
     )
     print("\n--- Thống kê phiên chat ---")
     for key, value in stats.items():
