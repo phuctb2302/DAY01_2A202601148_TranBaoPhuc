@@ -373,53 +373,7 @@ def run_assistant(
     get_input: Callable[[], str] = None,
     max_turns: int = None,
 ) -> dict:
-    """
-    Trợ lý CLI hoàn chỉnh — ghép mọi thứ bạn đã xây trong Part 1–3.
 
-    Hành vi:
-        1. Dùng `persona` làm system prompt cho TOÀN BỘ phiên chat.
-        2. Mỗi lượt: đọc tin nhắn qua get_input(); nếu là 'quit'/'exit'/'bye'
-           (không phân biệt hoa thường) → kết thúc phiên.
-        3. Gọi API với stream=True, messages = system + history + tin nhắn mới.
-           Bọc lời gọi API trong retry_with_backoff để chịu lỗi tạm thời.
-        4. In từng chunk khi stream về, ghép lại thành reply hoàn chỉnh.
-        5. Cập nhật history (user + assistant), giữ tối đa 4 lượt cuối
-           (8 message): history = history[-8:]
-        6. Cộng dồn thống kê bằng count_tokens và estimate_cost.
-        7. Dừng khi đạt max_turns (nếu được đặt).
-
-    Args:
-        persona:   Mô tả vai trò, dùng làm system prompt.
-        get_input: Hàm đọc input (mặc định: input). Tham số này giúp
-                   test tự động không cần bàn phím thật.
-        max_turns: Số lượt tối đa (None = không giới hạn).
-
-    Returns:
-        Dict thống kê phiên chat:
-            - "turns":    int   (số lượt hỏi–đáp đã thực hiện)
-            - "tokens_used": int   (tổng token user + assistant)
-            - "total_cost":   float (tổng USD ước tính)
-            - "history":      list  (history còn lại sau khi cắt, ≤ 8 message)
-
-    Gợi ý khung sườn:
-        if get_input is None:
-            get_input = input
-        history, turns, tokens_used, total_cost = [], 0, 0, 0.0
-        while True:
-            if max_turns is not None and turns >= max_turns:
-                break
-            user_msg = get_input()
-            if user_msg.strip().lower() in ("quit", "exit", "bye"):
-                break
-            messages = [{"role": "system", "content": persona}] + history \\
-                       + [{"role": "user", "content": user_msg}]
-            # stream = retry_with_backoff(lambda: client.chat...create(
-            #              model=..., messages=messages, stream=True))
-            # reply = ghép các chunk...
-            ...
-        return {"turns": turns, "tokens_used": tokens_used,
-                "total_cost": total_cost, "history": history}
-    """
     # TODO: triển khai theo khung sườn trong docstring
     from openai import OpenAI
 
